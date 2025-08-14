@@ -1,56 +1,20 @@
-import HeaderShell from '@/components/header-shell';
-import { Icons } from '@/components/icons';
-import { TypewriterEffectSmooth } from '@/components/typewriter-effect';
-import { Button } from '@/components/ui/button';
-import { authOptions } from '@/lib/auth';
-import { getCurrentUser } from '@/lib/session';
-import { redirect } from 'next/navigation';
+import { AIChatInterface } from '@/components/ai-chat-interface';
+import { GlassmorphicNavbar } from '@/components/glassmorphic-navbar';
 
 export const metadata = {
-  title: 'Next JS AI tool layout',
-  description: 'Next JS AI tool layout for your SaaS',
+  title: 'AI Assistant',
+  description: 'Your intelligent data companion',
 };
 
-const words = [
-  {
-    text: 'Welcome',
-  },
-  {
-    text: 'to',
-  },
-  {
-    text: 'AI',
-  },
-  {
-    text: 'tool',
-  },
-  {
-    text: 'Layout',
-    className: 'text-primary',
-  },
-];
-
 export default async function Page() {
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect(authOptions?.pages?.signIn || '/login');
-  }
   return (
     <>
-      <HeaderShell>
-        <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
-      </HeaderShell>
-      <div className="flex flex-1  justify-center rounded-lg  shadow-sm">
-        <div className="flex flex-col items-center gap-1 text-center">
-          <Icons.checkSuccess className="h-10 w-10" />
-          <h3 className="text-4xl font-bold tracking-tight">
-            <TypewriterEffectSmooth words={words} />
-          </h3>
-          <p className="my-4 text-2xl text-muted-foreground">
-            High quality layout to make your Next JS AI app look more amazing!
-          </p>
-          <Button className="mt-4">Check the Layout</Button>
-        </div>
+      <GlassmorphicNavbar 
+        title="AI Assistant" 
+        description="Your intelligent data companion"
+      />
+      <div className="flex-1 bg-transparent overflow-auto">
+        <AIChatInterface />
       </div>
     </>
   );

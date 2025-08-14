@@ -1,23 +1,19 @@
 'use client';
 
 import { getInitials, truncate } from '@/lib/utils';
-import { Settings2Icon } from 'lucide-react';
+import { ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { User } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Button } from './ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+  Dropdown,
+  DropdownButton,
+  DropdownItems,
+  DropdownItem,
+  DropdownSeparator,
+} from './ui/catalyst-dropdown';
 import { Skeleton } from './ui/skeleton';
 
 interface UserDropdownProps {
@@ -46,65 +42,49 @@ export default function UserDropdown({ getCurrentUser }: UserDropdownProps) {
   }
 
   return (
-    <div className="flex flex-col gap-1 md:mb-4 ">
+    <div className="flex flex-col gap-1 md:mb-4">
       <div className="my-1 w-full border-b border-foreground/10"></div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="relative flex h-10 w-full justify-between p-0 hover:bg-primary/20">
-            <div className="flex items-center">
-              <Avatar className="mx-2 h-8 w-8">
-                <AvatarImage
-                  src={user.image || ''}
-                  alt={user.name || user.email || ''}
-                />
-                <AvatarFallback>
-                  {getInitials(user.name || user.email)}
-                </AvatarFallback>
-              </Avatar>
-              <span className="px-2 text-sm font-medium leading-none text-muted-foreground">
-                {user.name || truncate(user.email!, 18)}
-              </span>
-            </div>
-            <Settings2Icon className="mr-2 h-4 w-4 text-muted-foreground/60 hover:text-muted-foreground" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          className="w-[calc(100vw-40px)] sm:w-[250px]"
-          align="end"
-          forceMount>
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user?.name}</p>
-              <p className="text-xs leading-none text-muted-foreground">
-                {user.email}
-              </p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem asChild>
-              <Link href="/home">Dashboard</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/home/billing">Billing</Link>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onSelect={(event) => {
-              event.preventDefault();
+      <Dropdown>
+        <DropdownButton className="relative flex h-10 w-full justify-between bg-transparent p-2 text-left hover:bg-accent hover:text-accent-foreground focus:ring-0 focus:ring-offset-0 shadow-none ring-0 border-0">
+          <div className="flex items-center min-w-0">
+            <Avatar className="mr-3 h-8 w-8 shrink-0">
+              <AvatarImage
+                src={user.image || ''}
+                alt={user.name || user.email || ''}
+              />
+              <AvatarFallback>
+                {getInitials(user.name || user.email)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-medium text-muted-foreground truncate">
+              {user.name || truncate(user.email!, 18)}
+            </span>
+          </div>
+          <ChevronUpDownIcon className="h-4 w-4 text-muted-foreground/60 shrink-0" />
+        </DropdownButton>
+        <DropdownItems className="w-[calc(100vw-40px)] sm:w-[250px]" anchor="top end">
+          <div className="px-4 py-3 text-sm">
+            <div className="font-medium">{user?.name}</div>
+            <div className="text-muted-foreground">{user.email}</div>
+          </div>
+          <DropdownSeparator />
+          <DropdownItem>
+            <Link href="/home" className="w-full">Dashboard</Link>
+          </DropdownItem>
+          <DropdownItem>
+            <Link href="/home/billing" className="w-full">Billing</Link>
+          </DropdownItem>
+          <DropdownSeparator />
+          <DropdownItem
+            onClick={() => {
               signOut({
                 callbackUrl: `${window.location.origin}/login`,
               });
             }}>
             Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </DropdownItem>
+        </DropdownItems>
+      </Dropdown>
     </div>
   );
 }

@@ -23,14 +23,16 @@ export default function LoginForm() {
           ease: 'easeInOut',
         }}
         className="relative flex flex-col items-center justify-center gap-4 px-4">
-        <Card className="mx-auto max-w-sm shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-center text-2xl">Login</CardTitle>
-            <CardDescription className="text-balance text-center text-lg">
-              The Next JS AI layout for your next project.
+        <Card className="mx-auto w-full max-w-md shadow-xl border-0 bg-background/80 backdrop-blur-sm">
+          <CardHeader className="space-y-1 pb-6">
+            <CardTitle className="text-center text-2xl font-semibold tracking-tight">
+              Welcome back
+            </CardTitle>
+            <CardDescription className="text-center text-sm text-muted-foreground">
+              Sign in to your account to continue
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-6">
             <UserAuthForm />
           </CardContent>
         </Card>

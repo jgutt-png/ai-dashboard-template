@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transitioning Chat Bar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f7f7f8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 120px; /* Space for chat bar */
+        }
+
+        .content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .content h1 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .content p {
+            margin-bottom: 15px;
+        }
+
+        /* Chat Bar Styles */
+        .chat-bar {
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .chat-bar.transitioning {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            z-index: 1001;
+        }
+
+        .chat-bar.fixed {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            z-index: 1001;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: transparent;
+            color: #2d3748;
+        }
+
+        .chat-input::placeholder {
+            color: #a0aec0;
+        }
+
+        .send-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #4299e1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .send-button:hover {
+            background: #3182ce;
+        }
+
+        .send-button:disabled {
+            background: #e2e8f0;
+            cursor: not-allowed;
+        }
+
+        /* Demo Controls */
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: #3182ce;
+        }
+
+        .btn.secondary {
+            background: #718096;
+        }
+
+        .btn.secondary:hover {
+            background: #4a5568;
+        }
+
+        /* Placeholder for fixed positioning */
+        .chat-bar-placeholder {
+            width: 100%;
+            height: 0;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden;
+        }
+
+        .chat-bar-placeholder.active {
+            height: 80px;
+            visibility: visible;
+        }
+
+        /* Backdrop for fixed state */
+        .chat-backdrop {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(transparent, rgba(247, 247, 248, 0.8));
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .chat-backdrop.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1>Transitioning Chat Bar Demo</h1>
+            <p>This demo showcases a chat bar that smoothly transitions from its inline position to being fixed at the bottom of the viewport, similar to ChatGPT's interface.</p>
+            
+            <p>Scroll down to see the chat bar in its initial position. Click the "Make Fixed" button to trigger the animation that moves the chat bar to the bottom of the screen.</p>
+            
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="controls">
+        <button class="btn" onclick="makeChatBarFixed()">Make Fixed</button>
+        <button class="btn secondary" onclick="resetChatBar()">Reset to Inline</button>
+    </div>
+
+    <!-- Chat Bar -->
+    <div class="chat-bar" id="chatBar">
+        <input 
+            type="text" 
+            class="chat-input" 
+            placeholder="Message ChatGPT..." 
+            id="chatInput"
+        >
+        <button class="send-button" onclick="sendMessage()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Placeholder for spacing when fixed -->
+    <div class="chat-bar-placeholder" id="chatBarPlaceholder"></div>
+
+    <!-- Backdrop for fixed state -->
+    <div class="chat-backdrop" id="chatBackdrop"></div>
+
+    <div class="container">
+        <div class="content">
+            <h2>How It Works</h2>
+            <p><strong>Initial State:</strong> The chat bar is positioned normally in the document flow with <code>position: relative</code>.</p>
+            
+            <p><strong>Transition:</strong> When triggered, JavaScript calculates the current position and animates the bar to the bottom using CSS transforms and transitions.</p>
+            
+            <p><strong>Fixed State:</strong> After animation completes, the bar switches to <code>position: fixed</code> and stays at the bottom.</p>
+            
+            <p>The animation preserves the width and provides smooth easing for a professional feel. A backdrop blur effect is added for better visual separation when fixed.</p>
+        </div>
+    </div>
+
+    <script>
+        class TransitioningChatBar {
+            constructor(chatBarSelector) {
+                this.chatBar = document.querySelector(chatBarSelector);
+                this.placeholder = document.getElementById('chatBarPlaceholder');
+                this.backdrop = document.getElementById('chatBackdrop');
+                this.isFixed = false;
+                this.originalPosition = null;
+                
+                // Bind methods
+                this.makeFixed = this.makeFixed.bind(this);
+                this.resetToInline = this.resetToInline.bind(this);
+            }
+
+            makeFixed() {
+                if (this.isFixed) return;
+
+                // Store original position and dimensions
+                const rect = this.chatBar.getBoundingClientRect();
+                this.originalPosition = {
+                    top: rect.top + window.scrollY,
+                    left: rect.left,
+                    width: rect.width,
+                    height: rect.height
+                };
+
+                // Calculate target position (bottom of viewport)
+                const targetY = window.innerHeight - rect.height - 20; // 20px from bottom
+                const currentY = rect.top;
+                const translateY = targetY - currentY;
+
+                // Set fixed width to prevent jumping
+                this.chatBar.style.width = rect.width + 'px';
+
+                // Add transitioning class and start animation
+                this.chatBar.classList.add('transitioning');
+                
+                // Force a reflow to ensure the transitioning class is applied
+                this.chatBar.offsetHeight;
+                
+                // Animate to bottom position
+                this.chatBar.style.transform = `translateX(-50%) translateY(${translateY}px)`;
+
+                // Show backdrop
+                this.backdrop.classList.add('active');
+
+                // After transition completes, switch to fixed positioning
+                setTimeout(() => {
+                    this.chatBar.classList.remove('transitioning');
+                    this.chatBar.classList.add('fixed');
+                    this.chatBar.style.transform = 'translateX(-50%)';
+                    this.chatBar.style.width = ''; // Reset width to allow responsiveness
+                    
+                    // Activate placeholder to maintain layout
+                    this.placeholder.classList.add('active');
+                    
+                    this.isFixed = true;
+                }, 400); // Match CSS transition duration
+            }
+
+            resetToInline() {
+                if (!this.isFixed) return;
+
+                // Remove fixed positioning
+                this.chatBar.classList.remove('fixed');
+                this.chatBar.classList.add('transitioning');
+                
+                // Calculate reverse animation
+                const currentRect = this.chatBar.getBoundingClientRect();
+                const targetY = this.originalPosition.top - window.scrollY;
+                const currentY = currentRect.top;
+                const translateY = targetY - currentY;
+
+                // Set width for consistency
+                this.chatBar.style.width = this.originalPosition.width + 'px';
+                
+                // Animate back to original position
+                this.chatBar.style.transform = `translateX(-50%) translateY(${translateY}px)`;
+
+                // Hide backdrop
+                this.backdrop.classList.remove('active');
+                
+                // Deactivate placeholder
+                this.placeholder.classList.remove('active');
+
+                // After transition, restore inline positioning
+                setTimeout(() => {
+                    this.chatBar.classList.remove('transitioning');
+                    this.chatBar.style.transform = '';
+                    this.chatBar.style.width = '';
+                    this.isFixed = false;
+                }, 400);
+            }
+        }
+
+        // Initialize the chat bar
+        const transitioningChatBar = new TransitioningChatBar('#chatBar');
+
+        // Global functions for demo buttons
+        function makeChatBarFixed() {
+            transitioningChatBar.makeFixed();
+        }
+
+        function resetChatBar() {
+            transitioningChatBar.resetToInline();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                alert(`Message sent: ${message}`);
+                input.value = '';
+            }
+        }
+
+        // Auto-trigger after page load for demonstration
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // Uncomment the line below to auto-trigger the transition
+                // transitioningChatBar.makeFixed();
+            }, 2000);
+        });
+
+        // Handle window resize to maintain proper positioning
+        window.addEventListener('resize', () => {
+            if (transitioningChatBar.isFixed) {
+                // Re-calculate positioning if needed
+                transitioningChatBar.chatBar.style.transform = 'translateX(-50%)';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import '@/styles/globals.css';
 
 import { Analytics } from '@/components/analytics';
-import { ThemeProvider } from '@/components/theme-provider';
+import { Providers } from '@/components/providers';
 import { fontDisplay, fontSans } from '@/lib/fonts';
 import { RootLayoutProps } from '@/types';
 
@@ -13,10 +13,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
         className={`${fontSans.variable} ${fontDisplay.variable}`}>
         <head />
         <body className="overflow-hidden">
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <Providers>
             {children}
             <Analytics />
-          </ThemeProvider>
+          </Providers>
         </body>
       </html>
     </>
